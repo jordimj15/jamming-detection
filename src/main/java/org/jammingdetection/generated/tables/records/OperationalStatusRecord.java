@@ -131,20 +131,6 @@ public class OperationalStatusRecord extends UpdatableRecordImpl<OperationalStat
         return (Short) get(7);
     }
 
-    /**
-     * Setter for <code>public.operational_status.sil_sup</code>.
-     */
-    public void setSilSup(Short value) {
-        set(8, value);
-    }
-
-    /**
-     * Getter for <code>public.operational_status.sil_sup</code>.
-     */
-    public Short getSilSup() {
-        return (Short) get(8);
-    }
-
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -168,7 +154,7 @@ public class OperationalStatusRecord extends UpdatableRecordImpl<OperationalStat
     /**
      * Create a detached, initialised OperationalStatusRecord
      */
-    public OperationalStatusRecord(Long id, Long flightId, Long fileId, OffsetDateTime ts, Short nicSupA, Short nacSupP, Short nicSupC, Short sil, Short silSup) {
+    public OperationalStatusRecord(Long id, Long flightId, Long fileId, OffsetDateTime ts, Short nicSupA, Short nacSupP, Short nicSupC, Short sil) {
         super(OperationalStatus.OPERATIONAL_STATUS);
 
         setId(id);
@@ -179,7 +165,6 @@ public class OperationalStatusRecord extends UpdatableRecordImpl<OperationalStat
         setNacSupP(nacSupP);
         setNicSupC(nicSupC);
         setSil(sil);
-        setSilSup(silSup);
         resetTouchedOnNotNull();
     }
 }

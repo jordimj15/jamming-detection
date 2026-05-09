@@ -76,15 +76,15 @@ public class AdsbFileRecord extends UpdatableRecordImpl<AdsbFileRecord> {
     /**
      * Setter for <code>public.adsb_file.time_to_decode</code>.
      */
-    public void setTimeToDecode(Short value) {
+    public void setTimeToDecode(Long value) {
         set(4, value);
     }
 
     /**
      * Getter for <code>public.adsb_file.time_to_decode</code>.
      */
-    public Short getTimeToDecode() {
-        return (Short) get(4);
+    public Long getTimeToDecode() {
+        return (Long) get(4);
     }
 
     // -------------------------------------------------------------------------
@@ -110,7 +110,7 @@ public class AdsbFileRecord extends UpdatableRecordImpl<AdsbFileRecord> {
     /**
      * Create a detached, initialised AdsbFileRecord
      */
-    public AdsbFileRecord(Long id, Short hour, Long sensorSerial, Integer totalMsgCount, Short timeToDecode) {
+    public AdsbFileRecord(Long id, Short hour, Long sensorSerial, Integer totalMsgCount, Long timeToDecode) {
         super(AdsbFile.ADSB_FILE);
 
         setId(id);

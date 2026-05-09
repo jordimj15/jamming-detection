@@ -7,7 +7,7 @@ public class AdsbFile {
     private short hour;
     private long sensorSerial;
     private int totalMsgCount;
-    private short timeToDecode;
+    private long timeToDecode;
 
     public AdsbFile (AdsbFileRecord record){
         this.id = record.getId();
@@ -17,4 +17,7 @@ public class AdsbFile {
         this.timeToDecode = record.getTimeToDecode();
     }
 
+    public long getId() {
+        return id;
+    }
 }

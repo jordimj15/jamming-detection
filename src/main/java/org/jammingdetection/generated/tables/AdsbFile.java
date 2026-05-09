@@ -80,7 +80,7 @@ public class AdsbFile extends TableImpl<AdsbFileRecord> {
     /**
      * The column <code>public.adsb_file.time_to_decode</code>.
      */
-    public final TableField<AdsbFileRecord, Short> TIME_TO_DECODE = createField(DSL.name("time_to_decode"), SQLDataType.SMALLINT.nullable(false), this, "");
+    public final TableField<AdsbFileRecord, Long> TIME_TO_DECODE = createField(DSL.name("time_to_decode"), SQLDataType.BIGINT.nullable(false), this, "");
 
     private AdsbFile(Name alias, Table<AdsbFileRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

@@ -8,17 +8,16 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
-import static org.jammingdetection.generated.Tables.ADSB_FILE;
+import static org.jammingdetection.generated.Tables.*;
 
 public class FileService {
-    public AdsbFile create (short hour, long sensorSerial, Instant firstMsgTs) {
-        OffsetDateTime ts = firstMsgTs.atOffset(ZoneOffset.UTC);
+    public AdsbFile create (short hour, long sensorSerial) {
         AdsbFileRecord record = Database.ctx
                 .insertInto(ADSB_FILE)
                 .set(ADSB_FILE.HOUR, hour)
                 .set(ADSB_FILE.SENSOR_SERIAL, sensorSerial)
                 .set(ADSB_FILE.TOTAL_MSG_COUNT, 0)
-                .set(ADSB_FILE.TIME_TO_DECODE, (short)0)
+                .set(ADSB_FILE.TIME_TO_DECODE, 0L)
                 .returning()
                 .fetchOne();
 
@@ -26,7 +25,38 @@ public class FileService {
         return file;
     }
 
-    public void finalizeFile(long fileId, int msgCount, short timeToDecode) {
+    public AdsbFile findExisting(short hour, long sensorSerial) {
+        AdsbFileRecord record = Database.ctx
+                .selectFrom(ADSB_FILE)
+                .where(ADSB_FILE.HOUR.eq(hour))
+                .and(ADSB_FILE.SENSOR_SERIAL.eq(sensorSerial))
+                .fetchOne();
+
+        if (record == null) return null;
+
+        return new AdsbFile(record);
+    }
+
+    public void deleteExistingData(long fileId) {
+        Database.ctx.deleteFrom(POSITION)
+                .where(POSITION.FILE_ID.eq(fileId))
+                .execute();
+
+        Database.ctx.deleteFrom(OPERATIONAL_STATUS)
+                .where(OPERATIONAL_STATUS.FILE_ID.eq(fileId))
+                .execute();
+
+        Database.ctx.deleteFrom(AIRBORNE_VELOCITY)
+                .where(AIRBORNE_VELOCITY.FILE_ID.eq(fileId))
+                .execute();
+
+        Database.ctx.deleteFrom(ADSB_FILE)
+                .where(ADSB_FILE.ID.eq(fileId))
+                .execute();
+    }
+
+
+    public void finalizeFile(long fileId, int msgCount, long timeToDecode) {
         Database.ctx
                 .update(ADSB_FILE)
                 .set(ADSB_FILE.TOTAL_MSG_COUNT,    msgCount)

@@ -4,7 +4,6 @@ import modes.computed.ComputedPosition;
 import modes.computed.ComputedSurfacePosition;
 
 import java.time.Instant;
-import java.util.Map;
 
 public class PositionMessage {
     private long flightId;
@@ -16,7 +15,9 @@ public class PositionMessage {
     private double longitude;
     private Integer altitude;
 
-    public PositionMessage (ComputedPosition decodedPosition) {
+    public PositionMessage (ComputedPosition decodedPosition, long flightId, long fileId) {
+        this.flightId = flightId;
+        this.fileId = fileId;
         this.ts = Instant.ofEpochMilli(decodedPosition.getTimeStamp());
         this.typeCode = (short) decodedPosition.getTypeCode();
         this.latitude = decodedPosition.getComputedLatitude();
@@ -65,8 +66,5 @@ public class PositionMessage {
 
     public Integer getAltitude() {
         return altitude;
-    }
-
-    public Map<String, Object> getF() {
     }
 }

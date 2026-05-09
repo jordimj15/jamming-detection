@@ -101,11 +101,6 @@ public class OperationalStatus extends TableImpl<OperationalStatusRecord> {
      */
     public final TableField<OperationalStatusRecord, Short> SIL = createField(DSL.name("sil"), SQLDataType.SMALLINT.nullable(false), this, "");
 
-    /**
-     * The column <code>public.operational_status.sil_sup</code>.
-     */
-    public final TableField<OperationalStatusRecord, Short> SIL_SUP = createField(DSL.name("sil_sup"), SQLDataType.SMALLINT.nullable(false), this, "");
-
     private OperationalStatus(Name alias, Table<OperationalStatusRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }

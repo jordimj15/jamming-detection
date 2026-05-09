@@ -16,7 +16,9 @@ public class AirborneVelocityMessage {
     private Double airSpeed;
     private Double magneticHeading;
 
-    public AirborneVelocityMessage (AirborneVelocity decodedVelocity){
+    public AirborneVelocityMessage (AirborneVelocity decodedVelocity, long flightId, long fileId){
+        this.flightId = flightId;
+        this.fileId = fileId;
         this.ts = Instant.ofEpochMilli(decodedVelocity.getTimeStamp());
         this.nacSubV = (short) decodedVelocity.getNACv();
         switch (decodedVelocity) {
@@ -37,5 +39,37 @@ public class AirborneVelocityMessage {
 
     public void setFileId(long fileId) {
         this.fileId = fileId;
+    }
+
+    public long getFlightId() {
+        return flightId;
+    }
+
+    public long getFileId() {
+        return fileId;
+    }
+
+    public Instant getTs() {
+        return ts;
+    }
+
+    public short getNacSubV() {
+        return nacSubV;
+    }
+
+    public Integer getGroundSpeedEW() {
+        return groundSpeedEW;
+    }
+
+    public Integer getGroundSpeedNS() {
+        return groundSpeedNS;
+    }
+
+    public Double getAirSpeed() {
+        return airSpeed;
+    }
+
+    public Double getMagneticHeading() {
+        return magneticHeading;
     }
 }

@@ -28,31 +28,27 @@ public class MessageService {
     private final List<AirborneVelocityMessage> airborneVelocityMessageList = new ArrayList<>();
 
     public void addToOperationalStatusList (OperationalStatus decodedOperationalStatus, long flightId, long fileId){
-        OperationalStatusMessage operationalStatusMessage = new OperationalStatusMessage(decodedOperationalStatus);
-        operationalStatusMessage.setFlightId(flightId);
-        operationalStatusMessage.setFileId(fileId);
-        operationalStatusMessageList.add(operationalStatusMessage);
+        operationalStatusMessageList.add(new OperationalStatusMessage(decodedOperationalStatus, flightId, fileId));
+        if (operationalStatusMessageList.size() >= FLUSH_THRESHOLD) flushOperationalStatus();
     }
 
     public void addToPositionList (ComputedPosition decodedComputedPosition, long flightId, long fileId) {
-        PositionMessage positionMessage = new PositionMessage(decodedComputedPosition);
-        positionMessage.setFlightId(flightId);
-        positionMessage.setFileId(fileId);
-        positionMessageList.add(positionMessage);
+        positionMessageList.add(new PositionMessage(decodedComputedPosition, flightId, fileId));
+        if (positionMessageList.size() >= FLUSH_THRESHOLD) flushPosition();
     }
 
     public void addToAirborneVelocity(AirborneVelocity decodedAirborneVelocity, long flightId, long fileId) {
-        AirborneVelocityMessage airborneVelocityMessage = new AirborneVelocityMessage(decodedAirborneVelocity);
-        airborneVelocityMessage.setFlightId(flightId);
-        airborneVelocityMessage.setFileId(fileId);
-        airborneVelocityMessageList.add(airborneVelocityMessage);
+        airborneVelocityMessageList.add(new AirborneVelocityMessage(decodedAirborneVelocity, flightId, fileId));
+        if(airborneVelocityMessageList.size() >= FLUSH_THRESHOLD) flushAirborneVelocity();
     }
 
     public void flushAll(){
-
+        flushPosition();
+        flushOperationalStatus();
+        flushAirborneVelocity();
     }
 
-    private void flushAllPositions(){
+    private void flushPosition(){
         if (positionMessageList.isEmpty()) return;
 
         BatchBindStep batch = Database.ctx.batch(
@@ -83,5 +79,69 @@ public class MessageService {
 
         batch.execute();
         positionMessageList.clear();
+    }
+
+    private void flushOperationalStatus(){
+        if (operationalStatusMessageList.isEmpty()) return;
+
+        BatchBindStep batch = Database.ctx.batch(
+                Database.ctx.insertInto(OPERATIONAL_STATUS,
+                        OPERATIONAL_STATUS.FLIGHT_ID,
+                        OPERATIONAL_STATUS.FILE_ID,
+                        OPERATIONAL_STATUS.TS,
+                        OPERATIONAL_STATUS.NIC_SUP_A,
+                        OPERATIONAL_STATUS.NAC_SUP_P,
+                        OPERATIONAL_STATUS.NIC_SUP_C,
+                        OPERATIONAL_STATUS.SIL
+                ).values((Long) null, null, null, null, null, null, null)
+        );
+
+        for (OperationalStatusMessage operationalStatusMessage : operationalStatusMessageList) {
+            batch.bind(
+                    operationalStatusMessage.getFlightId(),
+                    operationalStatusMessage.getFileId(),
+                    operationalStatusMessage.getTs().atOffset(ZoneOffset.UTC),
+                    operationalStatusMessage.getNicSubA(),
+                    operationalStatusMessage.getNacSubP(),
+                    operationalStatusMessage.getNicSupC(),
+                    operationalStatusMessage.getSil()
+            );
+        }
+
+        batch.execute();
+        operationalStatusMessageList.clear();
+    }
+
+    private void flushAirborneVelocity() {
+        if (airborneVelocityMessageList.isEmpty()) return;
+
+        BatchBindStep batch = Database.ctx.batch(
+                Database.ctx.insertInto(AIRBORNE_VELOCITY,
+                        AIRBORNE_VELOCITY.FLIGHT_ID,
+                        AIRBORNE_VELOCITY.FILE_ID,
+                        AIRBORNE_VELOCITY.TS,
+                        AIRBORNE_VELOCITY.NAC_SUB_V,
+                        AIRBORNE_VELOCITY.GROUND_SPEED_EW,
+                        AIRBORNE_VELOCITY.GROUND_SPEED_NS,
+                        AIRBORNE_VELOCITY.AIRSPEED,
+                        AIRBORNE_VELOCITY.MAGNETIC_HEADING
+                ).values((Long) null, null, null, null, null, null, null, null)
+        );
+
+        for (AirborneVelocityMessage airborneVelocityMessage : airborneVelocityMessageList) {
+            batch.bind(
+                    airborneVelocityMessage.getFlightId(),
+                    airborneVelocityMessage.getFileId(),
+                    airborneVelocityMessage.getTs().atOffset(ZoneOffset.UTC),
+                    airborneVelocityMessage.getNacSubV(),
+                    airborneVelocityMessage.getGroundSpeedEW(),
+                    airborneVelocityMessage.getGroundSpeedNS(),
+                    airborneVelocityMessage.getAirSpeed(),
+                    airborneVelocityMessage.getMagneticHeading()
+            );
+        }
+
+        batch.execute();
+        airborneVelocityMessageList.clear();
     }
 }

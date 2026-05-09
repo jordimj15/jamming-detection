@@ -92,4 +92,18 @@ public class FlightService {
         flight.setLastMsgTs(record.getLastMsgTs().toInstant());
         return flight;
     }
+
+    public void flushCache() {
+        flightCache.values().forEach(callsignMap ->
+                callsignMap.values().forEach(flight ->
+                        Database.ctx
+                                .update(FLIGHT)
+                                .set(FLIGHT.LAST_MSG_TS,
+                                        flight.getLastMsgTs().atOffset(ZoneOffset.UTC))
+                                .where(FLIGHT.ID.eq(flight.getId()))
+                                .execute()
+                )
+        );
+        flightCache.clear();
+    }
 }

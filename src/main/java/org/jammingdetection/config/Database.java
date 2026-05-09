@@ -13,10 +13,10 @@ public class Database {
 
     static {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:postgresql://localhost:5432/adsb_db");
-        config.setUsername("adsb");
-        config.setPassword("123456");
-        config.setMaximumPoolSize(10);
+        config.setJdbcUrl(Config.get("db.url"));
+        config.setUsername(Config.get("db.user"));
+        config.setPassword(Config.get("db.password"));
+        config.setMaximumPoolSize(Config.getInt("db.pool.size"));
 
         dataSource = new HikariDataSource(config);
         ctx = DSL.using(dataSource, SQLDialect.POSTGRES);

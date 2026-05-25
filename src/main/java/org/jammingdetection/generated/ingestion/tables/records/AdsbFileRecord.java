@@ -4,6 +4,8 @@
 package org.jammingdetection.generated.ingestion.tables.records;
 
 
+import java.time.LocalDate;
+
 import org.jammingdetection.generated.ingestion.tables.AdsbFile;
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -87,6 +89,34 @@ public class AdsbFileRecord extends UpdatableRecordImpl<AdsbFileRecord> {
         return (Long) get(4);
     }
 
+    /**
+     * Setter for <code>ingestion.adsb_file.file_date</code>.
+     */
+    public void setFileDate(LocalDate value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>ingestion.adsb_file.file_date</code>.
+     */
+    public LocalDate getFileDate() {
+        return (LocalDate) get(5);
+    }
+
+    /**
+     * Setter for <code>ingestion.adsb_file.time_to_detect</code>.
+     */
+    public void setTimeToDetect(Long value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>ingestion.adsb_file.time_to_detect</code>.
+     */
+    public Long getTimeToDetect() {
+        return (Long) get(6);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -110,7 +140,7 @@ public class AdsbFileRecord extends UpdatableRecordImpl<AdsbFileRecord> {
     /**
      * Create a detached, initialised AdsbFileRecord
      */
-    public AdsbFileRecord(Long id, Short hour, Long sensorSerial, Integer totalMsgCount, Long timeToDecode) {
+    public AdsbFileRecord(Long id, Short hour, Long sensorSerial, Integer totalMsgCount, Long timeToDecode, LocalDate fileDate, Long timeToDetect) {
         super(AdsbFile.ADSB_FILE);
 
         setId(id);
@@ -118,6 +148,8 @@ public class AdsbFileRecord extends UpdatableRecordImpl<AdsbFileRecord> {
         setSensorSerial(sensorSerial);
         setTotalMsgCount(totalMsgCount);
         setTimeToDecode(timeToDecode);
+        setFileDate(fileDate);
+        setTimeToDetect(timeToDetect);
         resetTouchedOnNotNull();
     }
 }

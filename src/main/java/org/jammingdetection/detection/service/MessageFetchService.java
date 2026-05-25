@@ -1,9 +1,11 @@
 package org.jammingdetection.detection.service;
 
 import org.jammingdetection.config.Database;
+import org.jammingdetection.generated.ingestion.Tables;
 import org.jammingdetection.generated.ingestion.tables.records.AirborneVelocityRecord;
 import org.jammingdetection.generated.ingestion.tables.records.OperationalStatusRecord;
 import org.jammingdetection.generated.ingestion.tables.records.PositionRecord;
+import org.jooq.Results;
 
 import java.util.List;
 import java.util.Map;

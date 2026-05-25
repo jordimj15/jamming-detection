@@ -4,16 +4,16 @@
 package org.jammingdetection.generated.detection;
 
 
-import org.jammingdetection.generated.detection.tables.NacSupPDowngrade;
-import org.jammingdetection.generated.detection.tables.NacSupVDowngrade;
-import org.jammingdetection.generated.detection.tables.NicDowngrade;
+import org.jammingdetection.generated.detection.tables.NacSupPAnomaly;
+import org.jammingdetection.generated.detection.tables.NacSupVAnomaly;
+import org.jammingdetection.generated.detection.tables.NicAnomaly;
 import org.jammingdetection.generated.detection.tables.PositionGapAnomaly;
-import org.jammingdetection.generated.detection.tables.SilDowngrade;
-import org.jammingdetection.generated.detection.tables.records.NacSupPDowngradeRecord;
-import org.jammingdetection.generated.detection.tables.records.NacSupVDowngradeRecord;
-import org.jammingdetection.generated.detection.tables.records.NicDowngradeRecord;
+import org.jammingdetection.generated.detection.tables.SilAnomaly;
+import org.jammingdetection.generated.detection.tables.records.NacSupPAnomalyRecord;
+import org.jammingdetection.generated.detection.tables.records.NacSupVAnomalyRecord;
+import org.jammingdetection.generated.detection.tables.records.NicAnomalyRecord;
 import org.jammingdetection.generated.detection.tables.records.PositionGapAnomalyRecord;
-import org.jammingdetection.generated.detection.tables.records.SilDowngradeRecord;
+import org.jammingdetection.generated.detection.tables.records.SilAnomalyRecord;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
@@ -31,9 +31,9 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
-    public static final UniqueKey<NacSupPDowngradeRecord> NAC_SUP_P_DOWNGRADE_PKEY = Internal.createUniqueKey(NacSupPDowngrade.NAC_SUP_P_DOWNGRADE, DSL.name("nac_sup_p_downgrade_pkey"), new TableField[] { NacSupPDowngrade.NAC_SUP_P_DOWNGRADE.ID }, true);
-    public static final UniqueKey<NacSupVDowngradeRecord> NAC_SUP_V_DOWNGRADE_PKEY = Internal.createUniqueKey(NacSupVDowngrade.NAC_SUP_V_DOWNGRADE, DSL.name("nac_sup_v_downgrade_pkey"), new TableField[] { NacSupVDowngrade.NAC_SUP_V_DOWNGRADE.ID }, true);
-    public static final UniqueKey<NicDowngradeRecord> NIC_DOWNGRADE_PKEY = Internal.createUniqueKey(NicDowngrade.NIC_DOWNGRADE, DSL.name("nic_downgrade_pkey"), new TableField[] { NicDowngrade.NIC_DOWNGRADE.ID }, true);
+    public static final UniqueKey<NacSupPAnomalyRecord> NAC_SUP_P_DOWNGRADE_PKEY = Internal.createUniqueKey(NacSupPAnomaly.NAC_SUP_P_ANOMALY, DSL.name("nac_sup_p_downgrade_pkey"), new TableField[] { NacSupPAnomaly.NAC_SUP_P_ANOMALY.ID }, true);
+    public static final UniqueKey<NacSupVAnomalyRecord> NAC_SUP_V_DOWNGRADE_PKEY = Internal.createUniqueKey(NacSupVAnomaly.NAC_SUP_V_ANOMALY, DSL.name("nac_sup_v_downgrade_pkey"), new TableField[] { NacSupVAnomaly.NAC_SUP_V_ANOMALY.ID }, true);
+    public static final UniqueKey<NicAnomalyRecord> NIC_DOWNGRADE_PKEY = Internal.createUniqueKey(NicAnomaly.NIC_ANOMALY, DSL.name("nic_downgrade_pkey"), new TableField[] { NicAnomaly.NIC_ANOMALY.ID }, true);
     public static final UniqueKey<PositionGapAnomalyRecord> POSITION_GAP_ANOMALY_PKEY = Internal.createUniqueKey(PositionGapAnomaly.POSITION_GAP_ANOMALY, DSL.name("position_gap_anomaly_pkey"), new TableField[] { PositionGapAnomaly.POSITION_GAP_ANOMALY.ID }, true);
-    public static final UniqueKey<SilDowngradeRecord> SIL_DOWNGRADE_PKEY = Internal.createUniqueKey(SilDowngrade.SIL_DOWNGRADE, DSL.name("sil_downgrade_pkey"), new TableField[] { SilDowngrade.SIL_DOWNGRADE.ID }, true);
+    public static final UniqueKey<SilAnomalyRecord> SIL_DOWNGRADE_PKEY = Internal.createUniqueKey(SilAnomaly.SIL_ANOMALY, DSL.name("sil_downgrade_pkey"), new TableField[] { SilAnomaly.SIL_ANOMALY.ID }, true);
 }

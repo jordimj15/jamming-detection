@@ -7,11 +7,11 @@ package org.jammingdetection.generated.detection;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jammingdetection.generated.detection.tables.NacSupPDowngrade;
-import org.jammingdetection.generated.detection.tables.NacSupVDowngrade;
-import org.jammingdetection.generated.detection.tables.NicDowngrade;
+import org.jammingdetection.generated.detection.tables.NacSupPAnomaly;
+import org.jammingdetection.generated.detection.tables.NacSupVAnomaly;
+import org.jammingdetection.generated.detection.tables.NicAnomaly;
 import org.jammingdetection.generated.detection.tables.PositionGapAnomaly;
-import org.jammingdetection.generated.detection.tables.SilDowngrade;
+import org.jammingdetection.generated.detection.tables.SilAnomaly;
 import org.jooq.Catalog;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
@@ -32,19 +32,19 @@ public class Detection extends SchemaImpl {
     public static final Detection DETECTION = new Detection();
 
     /**
-     * The table <code>detection.nac_sup_p_downgrade</code>.
+     * The table <code>detection.nac_sup_p_anomaly</code>.
      */
-    public final NacSupPDowngrade NAC_SUP_P_DOWNGRADE = NacSupPDowngrade.NAC_SUP_P_DOWNGRADE;
+    public final NacSupPAnomaly NAC_SUP_P_ANOMALY = NacSupPAnomaly.NAC_SUP_P_ANOMALY;
 
     /**
-     * The table <code>detection.nac_sup_v_downgrade</code>.
+     * The table <code>detection.nac_sup_v_anomaly</code>.
      */
-    public final NacSupVDowngrade NAC_SUP_V_DOWNGRADE = NacSupVDowngrade.NAC_SUP_V_DOWNGRADE;
+    public final NacSupVAnomaly NAC_SUP_V_ANOMALY = NacSupVAnomaly.NAC_SUP_V_ANOMALY;
 
     /**
-     * The table <code>detection.nic_downgrade</code>.
+     * The table <code>detection.nic_anomaly</code>.
      */
-    public final NicDowngrade NIC_DOWNGRADE = NicDowngrade.NIC_DOWNGRADE;
+    public final NicAnomaly NIC_ANOMALY = NicAnomaly.NIC_ANOMALY;
 
     /**
      * The table <code>detection.position_gap_anomaly</code>.
@@ -52,9 +52,9 @@ public class Detection extends SchemaImpl {
     public final PositionGapAnomaly POSITION_GAP_ANOMALY = PositionGapAnomaly.POSITION_GAP_ANOMALY;
 
     /**
-     * The table <code>detection.sil_downgrade</code>.
+     * The table <code>detection.sil_anomaly</code>.
      */
-    public final SilDowngrade SIL_DOWNGRADE = SilDowngrade.SIL_DOWNGRADE;
+    public final SilAnomaly SIL_ANOMALY = SilAnomaly.SIL_ANOMALY;
 
     /**
      * No further instances allowed
@@ -72,11 +72,11 @@ public class Detection extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
-            NacSupPDowngrade.NAC_SUP_P_DOWNGRADE,
-            NacSupVDowngrade.NAC_SUP_V_DOWNGRADE,
-            NicDowngrade.NIC_DOWNGRADE,
+            NacSupPAnomaly.NAC_SUP_P_ANOMALY,
+            NacSupVAnomaly.NAC_SUP_V_ANOMALY,
+            NicAnomaly.NIC_ANOMALY,
             PositionGapAnomaly.POSITION_GAP_ANOMALY,
-            SilDowngrade.SIL_DOWNGRADE
+            SilAnomaly.SIL_ANOMALY
         );
     }
 }

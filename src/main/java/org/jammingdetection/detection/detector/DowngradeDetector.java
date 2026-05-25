@@ -1,5 +1,6 @@
 package org.jammingdetection.detection.detector;
 
+import org.jammingdetection.config.Config;
 import org.jammingdetection.detection.service.AnomalyService;
 import org.jammingdetection.generated.ingestion.tables.records.AirborneVelocityRecord;
 import org.jammingdetection.generated.ingestion.tables.records.OperationalStatusRecord;
@@ -10,14 +11,18 @@ import java.util.Deque;
 import java.util.List;
 
 public class DowngradeDetector {
-    private static final int MAX_NACP_DOWNGRADE = 4;
-    private static final int MAX_SIL_DOWNGRADE = 2;
-    private static final int MAX_NACV_DOWNGRADE = 2;
-    private static final int NACP_WINDOW_SIZE = 5;
-    private static final int SIL_WINDOW_SIZE = 5;
-    private static final int NACV_WINDOW_SIZE = 25;
+    private static final int MAX_NACP_DOWNGRADE = Integer.parseInt(Config.get("detection.nacp.downgrade"));
+    private static final int MAX_SIL_DOWNGRADE = Integer.parseInt(Config.get("detection.sil.downgrade"));
+    private static final int MAX_NACV_DOWNGRADE = Integer.parseInt(Config.get("detection.nacv.downgrade"));
+    private static final int NACP_WINDOW_SIZE = Integer.parseInt(Config.get("detection.nacp.window"));
+    private static final int SIL_WINDOW_SIZE = Integer.parseInt(Config.get("detection.sil.window"));
+    private static final int NACV_WINDOW_SIZE = Integer.parseInt(Config.get("detection.nacv.window"));
 
-    AnomalyService anomalyService = new AnomalyService();
+    private AnomalyService anomalyService;
+
+    public DowngradeDetector (long fileId) {
+        this.anomalyService = new AnomalyService(fileId);
+    }
 
     public void detectSilNacpDowngrade(List<OperationalStatusRecord> opStatuses) {
         Deque<Short> nacpWindow = new ArrayDeque<>();
@@ -30,13 +35,15 @@ public class DowngradeDetector {
             if(!nacpWindow.isEmpty()) {
                 short nacpMaxValue = Collections.max(nacpWindow);
                 if(Math.abs(nacpMaxValue - currentNacp) > MAX_NACP_DOWNGRADE)  {
-                    //NACP ANOMALY
+                    anomalyService.saveNacSupPAnomaly(opStatus.getFlightId(), opStatus.getId(), nacpMaxValue, currentNacp, opStatus.getTs());
+                    nacpWindow.clear();
                 }
             }
             if(!silWindow.isEmpty()) {
                 short silMaxValue = Collections.max(silWindow);
                 if(Math.abs(silMaxValue - currentSil) > MAX_SIL_DOWNGRADE) {
-                    //SIL ANOMALY
+                    anomalyService.saveSilAnomaly(opStatus.getFlightId(), opStatus.getId(), silMaxValue, currentSil, opStatus.getTs());
+                    silWindow.clear();
                 }
             }
             addToWindow(nacpWindow, currentNacp, NACP_WINDOW_SIZE);
@@ -52,9 +59,11 @@ public class DowngradeDetector {
             if(!nacvWindow.isEmpty()) {
                 short nacvMaxValue = Collections.max(nacvWindow);
                 if(Math.abs(nacvMaxValue - currentNacV) > MAX_NACV_DOWNGRADE) {
-                    //nacv anomaly
+                    anomalyService.saveNacSupVAnomaly(velocity.getFlightId(), velocity.getId(), nacvMaxValue, currentNacV, velocity.getTs());
+                    nacvWindow.clear();
                 }
             }
+            addToWindow(nacvWindow, currentNacV, NACV_WINDOW_SIZE);
         }
     }
 

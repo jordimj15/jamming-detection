@@ -4,6 +4,7 @@
 package org.jammingdetection.generated.ingestion.tables;
 
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 import org.jammingdetection.generated.ingestion.Ingestion;
@@ -81,6 +82,16 @@ public class AdsbFile extends TableImpl<AdsbFileRecord> {
      * The column <code>ingestion.adsb_file.time_to_decode</code>.
      */
     public final TableField<AdsbFileRecord, Long> TIME_TO_DECODE = createField(DSL.name("time_to_decode"), SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>ingestion.adsb_file.file_date</code>.
+     */
+    public final TableField<AdsbFileRecord, LocalDate> FILE_DATE = createField(DSL.name("file_date"), SQLDataType.LOCALDATE.nullable(false), this, "");
+
+    /**
+     * The column <code>ingestion.adsb_file.time_to_detect</code>.
+     */
+    public final TableField<AdsbFileRecord, Long> TIME_TO_DETECT = createField(DSL.name("time_to_detect"), SQLDataType.BIGINT, this, "");
 
     private AdsbFile(Name alias, Table<AdsbFileRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);

@@ -89,6 +89,34 @@ public class PositionGapAnomalyRecord extends UpdatableRecordImpl<PositionGapAno
         return (Integer) get(4);
     }
 
+    /**
+     * Setter for <code>detection.position_gap_anomaly.flight_id</code>.
+     */
+    public void setFlightId(Long value) {
+        set(5, value);
+    }
+
+    /**
+     * Getter for <code>detection.position_gap_anomaly.flight_id</code>.
+     */
+    public Long getFlightId() {
+        return (Long) get(5);
+    }
+
+    /**
+     * Setter for <code>detection.position_gap_anomaly.file_id</code>.
+     */
+    public void setFileId(Long value) {
+        set(6, value);
+    }
+
+    /**
+     * Getter for <code>detection.position_gap_anomaly.file_id</code>.
+     */
+    public Long getFileId() {
+        return (Long) get(6);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -112,7 +140,7 @@ public class PositionGapAnomalyRecord extends UpdatableRecordImpl<PositionGapAno
     /**
      * Create a detached, initialised PositionGapAnomalyRecord
      */
-    public PositionGapAnomalyRecord(Long id, Long previousPositionId, Long afterPositionId, Integer receivedOs, Integer receivedAv) {
+    public PositionGapAnomalyRecord(Long id, Long previousPositionId, Long afterPositionId, Integer receivedOs, Integer receivedAv, Long flightId, Long fileId) {
         super(PositionGapAnomaly.POSITION_GAP_ANOMALY);
 
         setId(id);
@@ -120,6 +148,8 @@ public class PositionGapAnomalyRecord extends UpdatableRecordImpl<PositionGapAno
         setAfterPositionId(afterPositionId);
         setReceivedOs(receivedOs);
         setReceivedAv(receivedAv);
+        setFlightId(flightId);
+        setFileId(fileId);
         resetTouchedOnNotNull();
     }
 }

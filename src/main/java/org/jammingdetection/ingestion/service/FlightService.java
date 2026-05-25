@@ -21,8 +21,11 @@ public class FlightService {
     public Flight getOrCreate(AdsbMessage decodedMessage) {
         String icaoAddress = decodedMessage.getIcaoAddress();
         String callsign = decodedMessage.getCallsign();
+
         String aircraftCategory = decodedMessage.getAircraftCategory();
-        long timeStamp = decodedMessage.getTimeStamp();
+        long timeStamp = decodedMessage.getTimeStamp() / 1000;
+        Instant msgInstant = Instant.ofEpochMilli(timeStamp);
+
 
         flightCache.putIfAbsent(decodedMessage.getIcaoAddress(), new HashMap<>());
 
@@ -47,8 +50,13 @@ public class FlightService {
             }
             flightCache.get(icaoAddress).put(callsign, flight);
         }
-        flight.setLastMsgTs(Instant.ofEpochMilli(timeStamp));
 
+
+        if (msgInstant.isAfter(flight.getLastMsgTs())) {
+            flight.setLastMsgTs(msgInstant);
+        } else if (msgInstant.isBefore(flight.getFirstMsgTs())) {
+            flight.setFirstMsgTs(msgInstant);
+        }
         return flight;
     }
 
@@ -96,8 +104,8 @@ public class FlightService {
                 callsignMap.values().forEach(flight ->
                         Database.ctx
                                 .update(FLIGHT)
-                                .set(FLIGHT.LAST_MSG_TS,
-                                        flight.getLastMsgTs().atOffset(ZoneOffset.UTC))
+                                .set(FLIGHT.FIRST_MSG_TS, flight.getFirstMsgTs().atOffset(ZoneOffset.UTC))
+                                .set(FLIGHT.LAST_MSG_TS, flight.getLastMsgTs().atOffset(ZoneOffset.UTC))
                                 .where(FLIGHT.ID.eq(flight.getId()))
                                 .execute()
                 )

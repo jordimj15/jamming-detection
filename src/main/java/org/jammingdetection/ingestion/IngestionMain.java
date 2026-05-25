@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 import java.util.zip.GZIPInputStream;
@@ -25,7 +26,7 @@ import org.apache.commons.lang3.time.StopWatch;
 
 
 public class IngestionMain {
-    public static void main(String[] args) throws Exception{
+    public static long run(Path filePath, LocalDate fileDate) throws Exception {
         StopWatch stopWatch = new StopWatch();
         Decoder decoder = new Decoder();
         Preprocessor preprocessor = new Preprocessor();
@@ -33,19 +34,18 @@ public class IngestionMain {
         MessageService messageService = new MessageService();
         FileService fileService = new FileService();
 
-        Path filePath = Path.of("data/12_1808670454.txt.gz");
         String fileName = filePath.getFileName().toString();
         String[] fileNameParts = fileName.split("_");
 
         short hour = Short.parseShort(fileNameParts[0]);
         long sensorSerial = Long.parseLong(fileNameParts[1].replace(".txt.gz", ""));
 
-        AdsbFile adsbFile = fileService.findExisting(hour, sensorSerial);
+        AdsbFile adsbFile = fileService.findExisting(hour, sensorSerial, fileDate);
         if(adsbFile != null) {
             fileService.deleteExistingData(adsbFile.getId());
-        } else {
-            adsbFile = fileService.create(hour, sensorSerial);
         }
+        adsbFile = fileService.create(hour, sensorSerial, fileDate);
+
 
         int msgCount = 0;
         GZIPInputStream gzip   = new GZIPInputStream(new FileInputStream(filePath.toFile()));
@@ -61,6 +61,7 @@ public class IngestionMain {
                     for(AdsbMessage message : processedMessages){
                         Flight flight = flightService.getOrCreate(message);
                         long timestamp = message.getTimeStamp() / 1000;
+
                         switch (message){
                             case ComputedPosition computedPosition -> {
                                 if(flight.addPositionTimestampList(timestamp)){
@@ -85,12 +86,14 @@ public class IngestionMain {
             messageService.flushAll();
             flightService.flushCache();
             stopWatch.stop();
-            fileService.finalizeFile(adsbFile.getId(),  msgCount, stopWatch.getTime() / 1000);
-            Database.close();
+            System.out.println("Time to process INGESTION: " + stopWatch.getTime() + " ms");
+            fileService.finalizeFile(adsbFile.getId(),  msgCount, stopWatch.getTime());
+
         }
         catch (Exception e){
             System.err.println("Failed to read file: " + filePath);
             e.printStackTrace();
         }
+        return adsbFile.getId();
     }
 }

@@ -4,11 +4,11 @@
 package org.jammingdetection.generated.detection;
 
 
-import org.jammingdetection.generated.detection.tables.NacSupPDowngrade;
-import org.jammingdetection.generated.detection.tables.NacSupVDowngrade;
-import org.jammingdetection.generated.detection.tables.NicDowngrade;
+import org.jammingdetection.generated.detection.tables.NacSupPAnomaly;
+import org.jammingdetection.generated.detection.tables.NacSupVAnomaly;
+import org.jammingdetection.generated.detection.tables.NicAnomaly;
 import org.jammingdetection.generated.detection.tables.PositionGapAnomaly;
-import org.jammingdetection.generated.detection.tables.SilDowngrade;
+import org.jammingdetection.generated.detection.tables.SilAnomaly;
 
 
 /**
@@ -18,19 +18,19 @@ import org.jammingdetection.generated.detection.tables.SilDowngrade;
 public class Tables {
 
     /**
-     * The table <code>detection.nac_sup_p_downgrade</code>.
+     * The table <code>detection.nac_sup_p_anomaly</code>.
      */
-    public static final NacSupPDowngrade NAC_SUP_P_DOWNGRADE = NacSupPDowngrade.NAC_SUP_P_DOWNGRADE;
+    public static final NacSupPAnomaly NAC_SUP_P_ANOMALY = NacSupPAnomaly.NAC_SUP_P_ANOMALY;
 
     /**
-     * The table <code>detection.nac_sup_v_downgrade</code>.
+     * The table <code>detection.nac_sup_v_anomaly</code>.
      */
-    public static final NacSupVDowngrade NAC_SUP_V_DOWNGRADE = NacSupVDowngrade.NAC_SUP_V_DOWNGRADE;
+    public static final NacSupVAnomaly NAC_SUP_V_ANOMALY = NacSupVAnomaly.NAC_SUP_V_ANOMALY;
 
     /**
-     * The table <code>detection.nic_downgrade</code>.
+     * The table <code>detection.nic_anomaly</code>.
      */
-    public static final NicDowngrade NIC_DOWNGRADE = NicDowngrade.NIC_DOWNGRADE;
+    public static final NicAnomaly NIC_ANOMALY = NicAnomaly.NIC_ANOMALY;
 
     /**
      * The table <code>detection.position_gap_anomaly</code>.
@@ -38,7 +38,7 @@ public class Tables {
     public static final PositionGapAnomaly POSITION_GAP_ANOMALY = PositionGapAnomaly.POSITION_GAP_ANOMALY;
 
     /**
-     * The table <code>detection.sil_downgrade</code>.
+     * The table <code>detection.sil_anomaly</code>.
      */
-    public static final SilDowngrade SIL_DOWNGRADE = SilDowngrade.SIL_DOWNGRADE;
+    public static final SilAnomaly SIL_ANOMALY = SilAnomaly.SIL_ANOMALY;
 }

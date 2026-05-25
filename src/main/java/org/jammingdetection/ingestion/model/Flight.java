@@ -49,6 +49,7 @@ public class Flight {
         this.callsign = decodedMessage.getCallsign();
         this.aircraftCategory = decodedMessage.getAircraftCategory();
         this.firstMsgTs = Instant.ofEpochMilli(decodedMessage.getTimeStamp() / 1000);
+        this.lastMsgTs = Instant.ofEpochMilli(decodedMessage.getTimeStamp() / 1000);
     }
 
     public long getId() {

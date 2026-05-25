@@ -76,6 +76,16 @@ public class PositionGapAnomaly extends TableImpl<PositionGapAnomalyRecord> {
      */
     public final TableField<PositionGapAnomalyRecord, Integer> RECEIVED_AV = createField(DSL.name("received_av"), SQLDataType.INTEGER, this, "");
 
+    /**
+     * The column <code>detection.position_gap_anomaly.flight_id</code>.
+     */
+    public final TableField<PositionGapAnomalyRecord, Long> FLIGHT_ID = createField(DSL.name("flight_id"), SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>detection.position_gap_anomaly.file_id</code>.
+     */
+    public final TableField<PositionGapAnomalyRecord, Long> FILE_ID = createField(DSL.name("file_id"), SQLDataType.BIGINT.nullable(false), this, "");
+
     private PositionGapAnomaly(Name alias, Table<PositionGapAnomalyRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
     }

@@ -12,7 +12,7 @@ import static org.jammingdetection.generated.ingestion.Tables.*;
 public class AnomalyService {
 
     private static final long ANOMALY_DEDUP_POSITION_SECONDS = Config.getLong("detection.anomaly.dedup.position.seconds");
-    private static final long ANOMALY_DEDUP_DOWNGRADE_SECONDS = Config.getLong("detection.anomaly.dedup.position.seconds");
+    private static final long ANOMALY_DEDUP_DOWNGRADE_SECONDS = Config.getLong("detection.anomaly.dedup.downgrade.seconds");
 
     private final long fileId;
 

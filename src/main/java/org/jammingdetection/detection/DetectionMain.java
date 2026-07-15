@@ -38,18 +38,20 @@ public class DetectionMain {
             AirborneVelocityRecord prevVelocity = currentVelocities.isEmpty() ? null :
                     fetchService.fetchPreviousAirborneVelocity(currentVelocities.getFirst());
 
-            if (prevPosition != null)   currentPositions.addFirst(prevPosition);
+            List<OperationalStatusRecord> allPreviousOpStatuses = new ArrayList<>();
+            List<AirborneVelocityRecord> allPreviousVelocities = new ArrayList<>();
+
+            if (prevPosition != null) {
+                allPreviousOpStatuses = fetchService.fetchAllPreviousOperationalStatus(prevPosition, currentPositions.getFirst());
+                allPreviousVelocities = fetchService.fetchAllPreviousAirborneVelocity(prevPosition, currentPositions.getFirst());
+                currentPositions.addFirst(prevPosition);
+            }
             if (prevOpStatus != null)   currentOpStatuses.addFirst(prevOpStatus);
             if (prevVelocity != null)   currentVelocities.addFirst(prevVelocity);
 
-            if (!currentPositions.isEmpty() && !currentOpStatuses.isEmpty())
-                positionGapDetector.detectPositionGaps(currentPositions, currentOpStatuses, currentVelocities);
-
-            if (!currentOpStatuses.isEmpty())
-                downgradeDetector.detectSilNacpDowngrade(currentOpStatuses);
-
-            if (!currentVelocities.isEmpty())
-                downgradeDetector.detectNacvDowngrade(currentVelocities);
+            positionGapDetector.detectPositionGaps(currentPositions, currentOpStatuses, currentVelocities, allPreviousOpStatuses, allPreviousVelocities);
+            downgradeDetector.detectSilNacpNicDowngrade(currentOpStatuses, currentPositions);
+            downgradeDetector.detectNacvDowngrade(currentVelocities);
         }
         stopWatch.stop();
 

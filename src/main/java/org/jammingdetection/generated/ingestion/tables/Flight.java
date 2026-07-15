@@ -76,7 +76,7 @@ public class Flight extends TableImpl<FlightRecord> {
     /**
      * The column <code>ingestion.flight.aircraft_category</code>.
      */
-    public final TableField<FlightRecord, String> AIRCRAFT_CATEGORY = createField(DSL.name("aircraft_category"), SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<FlightRecord, String> AIRCRAFT_CATEGORY = createField(DSL.name("aircraft_category"), SQLDataType.CLOB, this, "");
 
     /**
      * The column <code>ingestion.flight.first_msg_ts</code>.

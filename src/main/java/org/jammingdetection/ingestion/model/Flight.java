@@ -19,25 +19,13 @@ public class Flight {
     private final Set<Long> airborneVelocityTimestampList = new HashSet<>();
 
     public boolean addPositionTimestampList(long timestamp){
-        if(!positionTimestampList.contains(timestamp)) {
-            positionTimestampList.add(timestamp);
-            return true;
-        }
-        return false;
+        return positionTimestampList.add(timestamp);
     }
     public boolean addOperationalStatusTimestampList(long timestamp){
-        if(!operationalStatusTimestampList.contains(timestamp)) {
-            operationalStatusTimestampList.add(timestamp);
-            return true;
-        }
-        return false;
+        return operationalStatusTimestampList.add(timestamp);
     }
     public boolean addAirborneVelocityTimestampList(long timestamp){
-        if(!airborneVelocityTimestampList.contains(timestamp)) {
-            airborneVelocityTimestampList.add(timestamp);
-            return true;
-        }
-        return false;
+        return airborneVelocityTimestampList.add(timestamp);
     }
 
     public Flight () {

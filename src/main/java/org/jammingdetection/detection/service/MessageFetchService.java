@@ -57,6 +57,17 @@ public class MessageFetchService {
                 .fetchOne();
     }
 
+    public List<OperationalStatusRecord> fetchAllPreviousOperationalStatus(PositionRecord prevPositionRecord, PositionRecord firstPositionRecord) {
+        return Database.ctx
+                .selectFrom(OPERATIONAL_STATUS)
+                .where(OPERATIONAL_STATUS.FLIGHT_ID.eq(prevPositionRecord.getFlightId()))
+                .and(OPERATIONAL_STATUS.FILE_ID.eq(prevPositionRecord.getFileId()))
+                .and(OPERATIONAL_STATUS.TS.greaterThan(prevPositionRecord.getTs()))
+                .and(OPERATIONAL_STATUS.TS.lessThan(firstPositionRecord.getTs()))
+                .orderBy(OPERATIONAL_STATUS.TS.desc())
+                .fetchInto(OperationalStatusRecord.class);
+    }
+
     public Map<Long, List<AirborneVelocityRecord>> fetchAirborneVelocity(long fileId) {
         return Database.ctx
                 .selectFrom(AIRBORNE_VELOCITY)
@@ -76,6 +87,17 @@ public class MessageFetchService {
                 .orderBy(AIRBORNE_VELOCITY.TS.desc())
                 .limit(1)
                 .fetchOne();
+    }
+
+    public List<AirborneVelocityRecord> fetchAllPreviousAirborneVelocity(PositionRecord prevPositionRecord, PositionRecord firstPositionRecord) {
+        return Database.ctx
+                .selectFrom(AIRBORNE_VELOCITY)
+                .where(AIRBORNE_VELOCITY.FLIGHT_ID.eq(prevPositionRecord.getFlightId()))
+                .and(AIRBORNE_VELOCITY.FILE_ID.eq(prevPositionRecord.getFileId()))
+                .and(AIRBORNE_VELOCITY.TS.greaterThan(prevPositionRecord.getTs()))
+                .and(AIRBORNE_VELOCITY.TS.lessThan(firstPositionRecord.getTs()))
+                .orderBy(AIRBORNE_VELOCITY.TS.desc())
+                .fetchInto(AirborneVelocityRecord.class);
     }
 
 }

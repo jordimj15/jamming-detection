@@ -3,6 +3,7 @@ package org.jammingdetection;
 import org.jammingdetection.config.Config;
 import org.jammingdetection.config.Database;
 import org.jammingdetection.detection.DetectionMain;
+import org.jammingdetection.detection.service.AnomalyService;
 import org.jammingdetection.ingestion.IngestionMain;
 
 import java.io.IOException;
@@ -35,8 +36,6 @@ public class main {
                     Integer.parseInt(relative.getName(2).toString())
             );
 
-            String fileName = filePath.getFileName().toString();
-
             try{
                 long fileId = IngestionMain.run(filePath, fileDate);
                 DetectionMain.run(fileId);
@@ -45,6 +44,8 @@ public class main {
                 e.printStackTrace();
             }
         }
+
+        AnomalyService.filterFalsePositionGaps();
         Database.close();
     }
 }

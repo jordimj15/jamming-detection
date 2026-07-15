@@ -3,8 +3,12 @@ package org.jammingdetection.detection.service;
 import org.jammingdetection.config.Config;
 import org.jammingdetection.config.Database;
 import org.jammingdetection.generated.detection.tables.records.PositionGapAnomalyRecord;
+import org.jooq.Record2;
+import org.jooq.impl.DSL;
 
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import static org.jammingdetection.generated.detection.Tables.*;
 import static org.jammingdetection.generated.ingestion.Tables.*;
@@ -20,7 +24,7 @@ public class AnomalyService {
         this.fileId = fileId;
     }
 
-    public void savePositionGapAnomaly(long flightId, long previousMsgId, long lastMsgId, int receivedOs, int receivedAv, OffsetDateTime ts) {
+    public void savePositionGapAnomaly(long flightId, Long previousMsgId, long lastMsgId, int receivedOs, int receivedAv, OffsetDateTime ts) {
         PositionGapAnomalyRecord existing = Database.ctx
                 .select(POSITION_GAP_ANOMALY.fields())
                 .from(POSITION_GAP_ANOMALY)
@@ -32,7 +36,8 @@ public class AnomalyService {
                         ts.minusSeconds(ANOMALY_DEDUP_POSITION_SECONDS),
                         ts.plusSeconds(ANOMALY_DEDUP_POSITION_SECONDS)
                 ))
-                .fetchOneInto(PositionGapAnomalyRecord.class);
+                .limit(1)
+                .fetchAnyInto(PositionGapAnomalyRecord.class);
 
         if (existing != null) {
             if (receivedOs <= existing.getReceivedOs()) return;
@@ -59,7 +64,6 @@ public class AnomalyService {
                 .set(POSITION_GAP_ANOMALY.RECEIVED_OS, receivedOs)
                 .set(POSITION_GAP_ANOMALY.RECEIVED_AV, receivedAv)
                 .execute();
-
     }
 
     private boolean nicAnomalyExists(long flightId, OffsetDateTime ts, boolean isDowngrade) {
@@ -176,6 +180,8 @@ public class AnomalyService {
     }
 
     public void saveNacSupVAnomaly(long flightId, long  airborneVelocityId,  short previousNacSupV, short currentNacSupV, OffsetDateTime ts) {
+        if (previousNacSupV > 4 || currentNacSupV > 4) return;
+
         boolean isDowngrade = currentNacSupV < previousNacSupV;
 
         if(nacvAnomalyExists(flightId, ts, isDowngrade)) return;
@@ -189,5 +195,53 @@ public class AnomalyService {
                 .set(NAC_SUP_V_ANOMALY.FLIGHT_ID, flightId)
                 .set(NAC_SUP_V_ANOMALY.FILE_ID, this.fileId)
                 .execute();
+    }
+
+    public static void filterFalsePositionGaps() {
+        List<PositionGapAnomalyRecord> gaps = Database.ctx
+                .selectFrom(POSITION_GAP_ANOMALY)
+                .fetch();
+
+        for (PositionGapAnomalyRecord gap : gaps) {
+            OffsetDateTime previousTs = Database.ctx
+                    .select(POSITION.TS)
+                    .from(POSITION)
+                    .where(POSITION.ID.eq(gap.getPreviousPositionId()))
+                    .fetchOneInto(OffsetDateTime.class);
+
+            OffsetDateTime lastTs = Database.ctx
+                    .select(POSITION.TS)
+                    .from(POSITION)
+                    .where(POSITION.ID.eq(gap.getAfterPositionId()))
+                    .fetchOneInto(OffsetDateTime.class);
+
+            if (previousTs == null || lastTs == null) continue;
+
+            long gapSeconds = ChronoUnit.SECONDS.between(previousTs, lastTs);
+            long expectedPositions = gapSeconds;
+
+            Record2<Long, Integer> bestSensor = Database.ctx
+                    .select(POSITION.FILE_ID, DSL.count().as("pos_count"))
+                    .from(POSITION)
+                    .where(POSITION.FLIGHT_ID.eq(gap.getFlightId()))
+                    .and(POSITION.FILE_ID.notEqual(gap.getFileId()))
+                    .and(POSITION.TS.greaterThan(previousTs))
+                    .and(POSITION.TS.lessThan(lastTs))
+                    .groupBy(POSITION.FILE_ID)
+                    .orderBy(DSL.count().desc())
+                    .limit(1)
+                    .fetchOne();
+
+            if (bestSensor == null) continue;
+
+            int positionsFromBestSensor = bestSensor.value2();
+
+            if (positionsFromBestSensor > expectedPositions / 2) {
+                Database.ctx
+                        .deleteFrom(POSITION_GAP_ANOMALY)
+                        .where(POSITION_GAP_ANOMALY.ID.eq(gap.getId()))
+                        .execute();
+            }
+        }
     }
 }

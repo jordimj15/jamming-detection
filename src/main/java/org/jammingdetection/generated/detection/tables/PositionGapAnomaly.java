@@ -59,7 +59,7 @@ public class PositionGapAnomaly extends TableImpl<PositionGapAnomalyRecord> {
      * The column
      * <code>detection.position_gap_anomaly.previous_position_id</code>.
      */
-    public final TableField<PositionGapAnomalyRecord, Long> PREVIOUS_POSITION_ID = createField(DSL.name("previous_position_id"), SQLDataType.BIGINT.nullable(false), this, "");
+    public final TableField<PositionGapAnomalyRecord, Long> PREVIOUS_POSITION_ID = createField(DSL.name("previous_position_id"), SQLDataType.BIGINT, this, "");
 
     /**
      * The column <code>detection.position_gap_anomaly.after_position_id</code>.

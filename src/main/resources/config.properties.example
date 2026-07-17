@@ -2,22 +2,22 @@
 # COMPLETE THE INFORMATION
 
 # Database
-db.url=jdbc:postgresql:
+db.url=
 db.user=
 db.password=
 db.pool.size=
 
 # Ingestion
-ingestion.data.path=data
+ingestion.data.path=data/
 ingestion.flush.threshold=10000
 ingestion.max.flight.time=2700000
 
 # Detection
-detection.nic.time=5000
+detection.nic.time=3500
 detection.nic.window=25
 detection.nic.downgrade=4
 
-detection.pos.time=30000
+detection.pos.time=15000
 
 detection.nacp.window=5
 detection.nacp.downgrade=4
@@ -28,4 +28,5 @@ detection.nacv.downgrade=2
 detection.sil.window=5
 detection.sil.downgrade=2
 
-detection.anomaly.dedup.seconds=10000
+detection.anomaly.dedup.position.seconds=5000
+detection.anomaly.dedup.downgrade.seconds=500

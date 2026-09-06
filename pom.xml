@@ -14,6 +14,13 @@
         <jooq.version>3.21.2</jooq.version>
     </properties>
 
+    <repositories>
+        <repository>
+            <id>project-local-repo</id>
+            <url>file://${project.basedir}/local-repo</url>
+        </repository>
+    </repositories>
+
     <dependencies>
 
         <dependency>
@@ -38,8 +45,6 @@
             <groupId>org.jammingdetection</groupId>
             <artifactId>decoder_module</artifactId>
             <version>1.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/decoder_module.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -124,4 +129,3 @@
     </build>
 
 </project>
-

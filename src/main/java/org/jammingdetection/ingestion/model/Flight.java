@@ -6,6 +6,15 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Represents a single flight: a continuous sequence of ADS-B messages
+ * sharing the same ICAO address and callsign, as resolved by {@code FlightService}.
+ *
+ * <p>Tracks the time range covered by the flight's messages, along with
+ * message types sets of the timestamps. These sets are used to detect
+ * and skip duplicate messages.
+ */
+
 public class Flight {
     private long id;
     private String icaoAddress;

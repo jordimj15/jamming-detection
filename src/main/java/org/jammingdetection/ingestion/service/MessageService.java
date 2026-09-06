@@ -3,6 +3,7 @@ package org.jammingdetection.ingestion.service;
 import modes.computed.ComputedPosition;
 import modes.raw.AirborneVelocity;
 import modes.raw.OperationalStatus;
+
 import org.jammingdetection.config.Config;
 import org.jammingdetection.config.Database;
 import org.jammingdetection.ingestion.model.AirborneVelocityMessage;
@@ -17,40 +18,88 @@ import java.util.List;
 
 import static org.jammingdetection.generated.ingestion.Tables.*;
 
-
+/**
+ * Buffers decoded ADS-B messages in memory and flushes them to the database
+ * in batches, for position, operational status, and airborne velocity
+ * message types.
+ *
+ * <p>Batching avoids one database transaction per decoded message, which
+ * would be much slower given the amount of ADS-B messages per file. Each
+ * message type is accumulated in its own list and is flushed automatically
+ * once it reaches {@code ingestion.flush.threshold} entries, or manually
+ * with {@link #flushAll()} (e.g. at the end of the processing of the file, so
+ * that no message is lost).
+ */
 public class MessageService {
-    private static final int FLUSH_THRESHOLD = Config.getInt("ingestion.flush.threshold");;
 
+    /** Number of messages in memory of a given type that triggers an automatic flush. */
+    private static final int FLUSH_THRESHOLD = Config.getInt("ingestion.flush.threshold");
 
     private final List<OperationalStatusMessage> operationalStatusMessageList = new ArrayList<>();
     private final List<PositionMessage> positionMessageList = new ArrayList<>();
     private final List<AirborneVelocityMessage> airborneVelocityMessageList = new ArrayList<>();
 
-    public void addToOperationalStatusList (OperationalStatus decodedOperationalStatus, long flightId, long fileId){
+    /**
+     * Buffers a decoded operational status message for later batch insertion,
+     * flushing the buffer immediately if it has reached {@link #FLUSH_THRESHOLD}.
+     *
+     * @param decodedOperationalStatus the decoded operational status message
+     * @param flightId the ID of the {@code Flight} this message belongs to
+     * @param fileId the ID of the ADS-B file this message was read from
+     */
+    public void addToOperationalStatusList(OperationalStatus decodedOperationalStatus, long flightId, long fileId) {
         operationalStatusMessageList.add(new OperationalStatusMessage(decodedOperationalStatus, flightId, fileId));
         if (operationalStatusMessageList.size() >= FLUSH_THRESHOLD)
             flushOperationalStatus();
     }
 
-    public void addToPositionList (ComputedPosition decodedComputedPosition, long flightId, long fileId) {
+    /**
+     * Buffers a decoded position message for later batch insertion, flushing
+     * the buffer immediately if it has reached {@link #FLUSH_THRESHOLD}.
+     *
+     * @param decodedComputedPosition the decoded position message
+     * @param flightId the ID of the {@code Flight} this message belongs to
+     * @param fileId the ID of the ADS-B file this message was read from
+     */
+    public void addToPositionList(ComputedPosition decodedComputedPosition, long flightId, long fileId) {
         positionMessageList.add(new PositionMessage(decodedComputedPosition, flightId, fileId));
         if (positionMessageList.size() >= FLUSH_THRESHOLD)
             flushPosition();
     }
 
+    /**
+     * Buffers a decoded airborne velocity message for later batch insertion,
+     * flushing the buffer immediately if it has reached {@link #FLUSH_THRESHOLD}.
+     *
+     * @param decodedAirborneVelocity the decoded airborne velocity message
+     * @param flightId the ID of the {@code Flight} this message belongs to
+     * @param fileId the ID of the ADS-B file this message was read from
+     */
     public void addToAirborneVelocity(AirborneVelocity decodedAirborneVelocity, long flightId, long fileId) {
         airborneVelocityMessageList.add(new AirborneVelocityMessage(decodedAirborneVelocity, flightId, fileId));
-        if(airborneVelocityMessageList.size() >= FLUSH_THRESHOLD)
+        if (airborneVelocityMessageList.size() >= FLUSH_THRESHOLD)
             flushAirborneVelocity();
     }
 
-    public void flushAll(){
+    /**
+     * Flushes all three buffers (position, operational status, airborne
+     * velocity) to the database, regardless of whether they have reached
+     * {@link #FLUSH_THRESHOLD}.
+     *
+     * <p>Intended to be called once ingestion of a file completes, so that
+     * any partially filled buffers are not left unwritten.
+     */
+    public void flushAll() {
         flushPosition();
         flushOperationalStatus();
         flushAirborneVelocity();
     }
 
-    private void flushPosition(){
+    /**
+     * Writes all buffered position messages to the database in a single
+     * batch insert, then clears the buffer.
+     */
+    private void flushPosition() {
         if (positionMessageList.isEmpty()) return;
 
         BatchBindStep batch = Database.ctx.batch(
@@ -66,7 +115,7 @@ public class MessageService {
                 ).values((Long) null, null, null, null, null, null, null, null)
         );
 
-        for (PositionMessage positionMessage: positionMessageList){
+        for (PositionMessage positionMessage : positionMessageList) {
             batch.bind(
                     positionMessage.getFlightId(),
                     positionMessage.getFileId(),
@@ -83,7 +132,11 @@ public class MessageService {
         positionMessageList.clear();
     }
 
-    private void flushOperationalStatus(){
+    /**
+     * Writes all buffered operational status messages to the database in a
+     * single batch insert, then clears the buffer.
+     */
+    private void flushOperationalStatus() {
         if (operationalStatusMessageList.isEmpty()) return;
 
         BatchBindStep batch = Database.ctx.batch(
@@ -114,6 +167,10 @@ public class MessageService {
         operationalStatusMessageList.clear();
     }
 
+    /**
+     * Writes all buffered airborne velocity messages to the database in a
+     * single batch insert, then clears the buffer.
+     */
     private void flushAirborneVelocity() {
         if (airborneVelocityMessageList.isEmpty()) return;
 

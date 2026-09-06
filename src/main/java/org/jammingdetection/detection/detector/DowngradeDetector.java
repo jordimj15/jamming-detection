@@ -12,6 +12,29 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 
+/**
+ * Detects downgrade (and upgrade) anomalies in ADS-B quality indicators:
+ * NACp, SIL, NACv, and NIC.
+ *
+ * <p>For indicators transmitted explicitly on a message (NACp and SIL on
+ * Operational Status, NACv on Airborne Velocity), the detection algorithm compares each
+ * new value against a sliding window of recent values for that flight,
+ * rather than only the previous one. This is done to prevent a downgrade
+ * that occurs gradually across several samples, too small to trigger a
+ * threshold on any single consecutive sample, from going undetected. When a
+ * change exceeding the configured threshold is found relative to the
+ * window's maximum, an anomaly is saved and the window is reset so
+ * subsequent comparisons start fresh from the new value.
+ *
+ * <p>NIC is not transmitted directly, it must be computed by pairing an
+ * Operational Status message (which carries NICsupA, and maybe NICsupC) with
+ * a nearby Position message (which carries the type code and maybe the NICsupB),
+ * following the DO-260B NIC decoding table. For each Operational Status
+ * message, the next Position message within {@link #MAX_NIC_TIME} is used
+ * to compute the NIC. Positions further away are considered too stale to
+ * pair reliably, and are therefore skipped. The same sliding-window comparison used
+ * for NACp/SIL is then applied to the computed NIC sequence.
+ */
 public class DowngradeDetector {
     private static final int MAX_NACP_DOWNGRADE = Integer.parseInt(Config.get("detection.nacp.downgrade"));
     private static final int NACP_WINDOW_SIZE = Integer.parseInt(Config.get("detection.nacp.window"));
@@ -33,6 +56,22 @@ public class DowngradeDetector {
         this.anomalyService = new AnomalyService(fileId);
     }
 
+    /**
+     * Scans a flight's Operational Status messages for SIL and NAC-p
+     * downgrades, and pairs each Operational Status with a nearby Position message
+     * to compute and scan for NIC downgrades.
+     *
+     * <p>NACp and SIL are compared directly against their respective
+     * sliding windows for every Operational Status message. For NIC, each
+     * Operational Status message is paired with the next Position message
+     * (by timestamp) as long as it falls within {@link #MAX_NIC_TIME}. If a
+     * valid NIC value can be computed for the pair (see
+     * {@link #computeNIC}), it is compared against the NIC window in the
+     * same way.
+     *
+     * @param opStatuses the flight's Operational Status messages, ordered by timestamp
+     * @param positions the flight's Position messages, ordered by timestamp
+     */
     public void detectSilNacpNicDowngrade(List<OperationalStatusRecord> opStatuses, List<PositionRecord> positions) {
         Deque<Short> nacpWindow = new ArrayDeque<>();
         Deque<Short> silWindow = new ArrayDeque<>();
@@ -59,6 +98,9 @@ public class DowngradeDetector {
                 }
             }
 
+            // Advance to and pair with the next Position message after this
+            // Operational Status message, if it's recent enough to be a
+            // reliable pairing for NIC computation.
             for(int i = currentPosIndex; i < positions.size(); i++) {
                 PositionRecord currentPosition = positions.get(i);
                 if(currentPosition.getTs().isAfter(opStatus.getTs())) {
@@ -85,6 +127,12 @@ public class DowngradeDetector {
         }
     }
 
+    /**
+     * Scans a flight's Airborne Velocity messages for NACv downgrades,
+     * using the same sliding-window comparison as {@link #detectSilNacpNicDowngrade}.
+     *
+     * @param velocities the flight's Airborne Velocity messages, sorted by timestamp
+     */
     public void detectNacvDowngrade(List<AirborneVelocityRecord> velocities) {
         Deque<Short> nacvWindow = new ArrayDeque<>();
 
@@ -101,11 +149,32 @@ public class DowngradeDetector {
         }
     }
 
+    /**
+     * Appends a value to a sliding window, removing the oldest entry once
+     * the window exceeds its configured size.
+     *
+     * @param window the window to update
+     * @param value the new value to add
+     * @param maxSize the maximum number of values the window may hold
+     */
     private void addToWindow(Deque<Short> window, short value, int maxSize) {
         window.addLast(value);
         if (window.size() > maxSize) window.pollFirst();
     }
 
+    /**
+     * Computes the NIC (Navigation Integrity Category) value for a paired
+     * Position/Operational Status message, as the DO-260B indicates.
+     *
+     * <p>NIC is only computable when both messages correspond to the same flight state:
+     * Surface-Surface (using the Type Code, NICsupA and NICsupC)
+     * or Airborne-Airborne (using the Type Code, NIC-sup-A and NIC-sup-B).
+     *
+     * @param position the paired Position message, providing the type code and, if airborne, NIC-sup-B
+     * @param operationalStatus the paired Operational Status message, providing NIC-sup-A and, if surface, NIC-sup-C
+     * @return the decoded NIC value, or {@code null} if the pair does not
+     * resolve to a defined NIC (unsupported type code, or an invalid combination of available NIC supplement fields)
+     */
     private Short computeNIC (PositionRecord position, OperationalStatusRecord operationalStatus){
         int tc = position.getTypeCode();
 

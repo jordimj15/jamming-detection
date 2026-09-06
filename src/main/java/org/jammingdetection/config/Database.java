@@ -6,6 +6,12 @@ import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 
+/**
+ * Initializes and exposes a shared HikariCP connection pool and jOOQ
+ * {@link DSLContext} for the PostgreSQL database, used throughout the
+ * application for all queries. Configuration values are read from
+ * {@link Config} on class load.
+ */
 public class Database {
 
     private static final HikariDataSource dataSource;

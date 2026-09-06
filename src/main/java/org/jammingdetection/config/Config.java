@@ -3,6 +3,11 @@ package org.jammingdetection.config;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Loads application configuration from {@code config.properties} on the
+ * classpath and exposes typed accessors for its values. Loaded once when
+ * the class is first referenced.
+ */
 public class Config {
 
     private static final Properties props = new Properties();

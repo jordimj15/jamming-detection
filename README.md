@@ -153,7 +153,6 @@ JammingDetection/
 │   ├── main/
 │   │   ├── java/
 │   │   └── resources/
-│   └── test/
 ├── pom.xml
 └── README.md
 ```
@@ -166,7 +165,7 @@ Whenever the database schema changes:
 2. Regenerate the jOOQ classes:
 
 ```bash
-mvn generate-sources
+mvn initialize generate-sources
 ```
 
 The application configuration is stored in:
